@@ -6,6 +6,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Random;
 import java.util.Scanner;
 
+import utilidades.Utilidades;
+
 public class Empleado implements Comparable<Empleado> {
 	private String nombre;
 	private String apellido;
@@ -79,18 +81,12 @@ public class Empleado implements Comparable<Empleado> {
 	}
 
 	public void getDatos() {
-		Scanner scanner = new Scanner(System.in);
-		DateTimeFormatter formate = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		System.out.print("Nombre: ");
-		nombre = scanner.next();
-		System.out.print("Apellido: ");
-		apellido = scanner.next();
-		System.out.print("DNI: ");
-		dni = scanner.next();
-		System.out.print("Fecha de Nacimiento (dd/MM/yyyy): ");
-		fechaNac = LocalDate.parse(scanner.next(), formate);
-		System.out.print("Fecha de Alta (dd/MM/yyyy): ");
-		fechaAlta = LocalDate.parse(scanner.next(), formate);
+	
+		nombre = Utilidades.introduceCadena("Nombre: ");;
+		apellido = Utilidades.introduceCadena("Apellido: ");;
+		dni= Utilidades.introduceCadena("DNI: ");
+		fechaNac = Utilidades.introduceFecha("Fecha de Nacimiento (dd/MM/yyyy): ");
+		fechaAlta = Utilidades.introduceFecha("Fecha de Alta (dd/MM/yyyy): ");
 	}
 
 	@Override

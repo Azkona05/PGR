@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
 import clases.Empleado;
+import utilidades.Utilidades;
 
 public class Principal {
 	public static void main(String[] args) {
@@ -14,13 +14,11 @@ public class Principal {
 		Empleado empleado = null;
 		List<Empleado> empleados = new ArrayList<>();
 		Random rand = new Random();
-		Scanner scanner = new Scanner(System.in);
 		int opc;
 
 		while (true) {
 			mostrarMenu();
-			System.out.print("Seleccione una opción: ");
-			opc = scanner.nextInt();
+			opc = Utilidades.introduceNumero("Seleccione una opción: ");
 
 			switch (opc) {
 			case 1:
@@ -33,10 +31,10 @@ public class Principal {
 				listadoEmpleadosPorApellido(empleados, empleado);
 				break;
 			case 4:
-				consultarModificarDatos(empleados, scanner);
+				consultarModificarDatos(empleados);
 				break;
 			case 5:
-				borrarEmpleado(empleados, scanner);
+				borrarEmpleado(empleados);
 				break;
 			case 6:
 				listadoEdadEmpleados(empleados);
@@ -45,17 +43,16 @@ public class Principal {
 				listadoEdadAlIngreso(empleados);
 				break;
 			case 8:
-				listadoAntiguedadDescendente(empleados);
+				listadoAntiguedadDescendente(empleados, empleado);
 				break;
 			case 9:
 				sorteoDiario(empleados, rand);
 				break;
 			case 10:
-				estadisticas(scanner, empleados);
+				estadisticas(empleados);
 				break;
 			case 11:
 				System.out.println("Saliendo del programa.");
-				scanner.close();
 				return;
 			default:
 				System.out.println("Opción no válida.");
@@ -63,23 +60,19 @@ public class Principal {
 		}
 	}
 
-	private static void estadisticas(Scanner scanner, List<Empleado> empleados) {
+	private static void estadisticas(List<Empleado> empleados) {
 		System.out.println("1. Cumpleaños");
 		System.out.println("2. Estadísticas de nombres");
-		System.out.print("Seleccione una opción: ");
-		int estadisticaOpcion = scanner.nextInt();
-		scanner.next();
+		int estadisticaOpcion = Utilidades.introduceNumero("Seleccione una opción: ");
 
 		if (estadisticaOpcion == 1) {
-			System.out.print("Ingrese el mes (1-12): ");
-			int mes = scanner.nextInt();
+			int mes = Utilidades.introduceNumero("Ingrese el mes (1-12): ");
 			estadisticasCumpleanios(mes, empleados);
 		} else if (estadisticaOpcion == 2) {
 			estadisticasNombres(empleados);
 		} else {
 			System.out.println("Opción no válida.");
 		}
-
 	}
 
 	private static void introducirDatosEmpleado(List<Empleado> empleados, Empleado empleado) {
@@ -102,43 +95,36 @@ public class Principal {
 
 	}
 
-	private static void consultarModificarDatos(List<Empleado> empleados, Scanner scanner) {
+	private static void consultarModificarDatos(List<Empleado> empleados) {
 		String dni;
 		int opc;
 		boolean eleccion = false;
-		System.out.println("Introduce el DNI: ");
-		dni = scanner.next();
+		dni = Utilidades.introduceCadena("Introduce el DNI: ");
 		for (Empleado empleado : empleados) {
 			if (empleado.getDni().equalsIgnoreCase(dni)) {
 				empleado.toString();
 			}
-			System.out.println("Quieres modificar algun dato del empleado introducido? (0-no, 1-si) ");
-			opc = scanner.nextInt();
+			opc = Utilidades.introduceNumero("Quieres modificar algun dato del empleado introducido? (0-no, 1-si) ");
 			if (opc == 1) {
 				eleccion = true;
-				System.out.println("Que quieres modificar? 1- Nombre, 2- Apellido, 3- Fecha Nacimiento, 4- Fecha alta, 5- Salir");
-				opc = scanner.nextInt();
+				opc = Utilidades.introduceNumero(
+						"Que quieres modificar? 1- Nombre, 2- Apellido, 3- Fecha Nacimiento, 4- Fecha alta, 5- Salir");
 				do {
 					if (opc == 1) {
-						System.out.println("Introduce nuevo nombre: ");
-						empleado.setNombre(scanner.next());
+						empleado.setNombre(Utilidades.introduceCadena("Introduce nuevo nombre: "));
 					} else if (opc == 2) {
-						System.out.println("Introduce nuevo apellido: ");
-						empleado.setApellido(scanner.next());
+						empleado.setApellido(Utilidades.introduceCadena("Introduce nuevo apellido: "));
 					} else if (opc == 3) {
-						System.out.println("Introduce nueva fecha: ");
-						empleado.setFechaNac(null);
-					} else if (opc ==4){
-						System.out.println("Introduce nueva fecha: ");
-						empleado.setFechaAlta(null);
-					}else {
+						empleado.setFechaNac(Utilidades.introduceFecha("Introduce nueva fecha: "));
+					} else if (opc == 4) {
+						empleado.setFechaAlta(Utilidades.introduceFecha("Introduce nueva fecha: "));
+					} else {
 						System.out.println("Gracias, saliendo...");
 					}
 				} while (opc < 5);
 			} else {
 				System.out.println("Okay");
 			}
-
 		}
 	}
 
@@ -148,24 +134,26 @@ public class Principal {
 	}
 
 	private static void listadoEdadEmpleados(List<Empleado> empleados) {
+		Empleado aux;
 		if (empleados.isEmpty()) {
 			System.out.println("No hay empleados.");
 		}
 
-		int mayor = Integer.MIN_VALUE;
-		int menor = Integer.MAX_VALUE;
-
-		for (Empleado empleado : empleados) {
-			int edad = empleado.calcularEdad();
-			if (edad > mayor)
-				mayor = edad;
-			if (edad < menor)
-				menor = edad;
+		for (int i = 0; i < empleados.size(); i++) {
+			for (int j = i + 1; j < empleados.size() + 1; j++) {
+				if (empleados.get(j).getFechaNac().isBefore(empleados.get(i).getFechaNac())) {
+					aux = empleados.get(j);
+					empleados.set(j, empleados.get(i));
+					empleados.get(j);
+					empleados.set(i, empleados.get(j));
+				}
+			}
 		}
-
-		System.out.println("Empleado más joven: " + menor);
-		System.out.println("Empleado más mayor: " + mayor);
+		listadoEmpleados(empleados);
+		System.out.println("El empleado mas joven es " + empleados.getFirst());
+		System.out.println("El empleado con mas experiencia es " + empleados.getLast());
 	}
+	
 
 	private static void listadoEdadAlIngreso(List<Empleado> empleados) {
 		for (Empleado empleado : empleados) {
@@ -211,23 +199,25 @@ public class Principal {
 	}
 
 	private static void listadoAntiguedadDescendente(List<Empleado> empleados, Empleado empleado) {
-      // empleados.sort(empleado.getFechaAlta()).reversed();
-		for(int i = 1; i<empleados.size(); i++){
-			for(int j= empleados.size()-1; j>=i; j-- ){
-				if (empleados.get(j).getFechaAlta().isBefore(empleados.get(i).getFechaAlta())){
-					aux = empleados[j-1];
-					empleados[j-1] = empleados[j];
-					empleados[j] = aux;			
+		Empleado aux;
+
+		for (int i = 0; i < empleados.size(); i++) {
+			for (int j = i + 1; j < empleados.size() + 1; j++) {
+				if (empleados.get(j).getFechaAlta().isBefore(empleados.get(i).getFechaAlta())) {
+					aux = empleados.get(j);
+					empleados.set(j, empleados.get(i)); 
+					empleados.get(j);
+					empleados.set(i, empleados.get(j));
 				}
 			}
-		}	
+		}
 		listadoEmpleados(empleados);
 	}
 
-	private static void borrarEmpleado(List<Empleado> empleados, Scanner scanner) {
+	private static void borrarEmpleado(List<Empleado> empleados) {
 		String dni;
-		System.out.println("Introduce el DNI: ");
-		dni = scanner.next();
+		dni = Utilidades.introduceCadena("Introduce el DNI: ");
 		empleados.removeIf(empleado -> empleado.getDni().equalsIgnoreCase(dni));
 	}
+
 }
